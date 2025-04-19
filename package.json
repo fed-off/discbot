@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+    "deploy": "ssh egebank \"PATH=\"$PATH:/root/.nvm/versions/node/v22.11.0/bin\" && cd discbot && git pull && npm i && service discbot restart && journalctl -f -u discbot\"",
+    "prodlogs": "ssh egebank \"journalctl -f -u discbot\"",
+    "stopprod": "ssh egebank \"service discbot stop\"",
+    "openserver": "ssh egebank"
   },
   "keywords": [],
   "author": "",
