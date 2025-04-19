@@ -1,4 +1,5 @@
 const { getUser } = require('../mongodb');
+const { InlineKeyboard } = require('grammy');
 
 async function handleProfile(ctx) {
   try {
@@ -12,9 +13,12 @@ async function handleProfile(ctx) {
       `🕒 Часовой пояс: ${user.timezone || '-'}\n` +
       `😴 Время засыпания: ${user.bedtime || '-'}\n` +
       `☀️ Время пробуждения: ${user.wakeupTime || '-'}\n` +
-      `🔔 Уведомления: ${user.notifications ? 'Включены' : 'Выключены'}`;
+      `🔔 Уведомления: ${user.notifications === true ? 'Включены' : 'Выключены'}`;
 
-    await ctx.reply(profile);
+    const keyboard = new InlineKeyboard()
+      .text('Настроить', 'setup_profile');
+
+    await ctx.reply(profile, { reply_markup: keyboard });
   } catch (error) {
     console.error('Ошибка команды /profile:', error);
     await ctx.reply('Упс... Что-то пошло не так 😥');

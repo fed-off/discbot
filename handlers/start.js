@@ -1,4 +1,4 @@
-const { addUser } = require('../mongodb');
+const { updateUser } = require('../mongodb');
 
 async function handleStart(ctx) {
   try {
@@ -6,7 +6,7 @@ async function handleStart(ctx) {
       chatId: ctx.chat.id,
       username: ctx.from.username || 'Unknown'
     };
-    const isNewUser = await addUser(userData);
+    await updateUser(userData, true);
 
     const message = `Привет, ${userData.username}! 😊\n` +
       `Сон — залог здоровья и успеха! Он улучшает настроение, память и энергию. ` +

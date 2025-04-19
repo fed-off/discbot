@@ -17,20 +17,26 @@ async function connectDB() {
   }
 }
 
-async function addUser(userData) {
+async function updateUser(userData, isNew = false) {
   try {
+    const defaultUser = {
+      timezone: null,
+      bedtime: null,
+      wakeupTime: null,
+      notifications: true,
+      sleepRecords: []
+    };
+
+    const updateData = isNew ? { ...defaultUser, ...userData } : userData;
+
     const result = await database
       .collection(collections.USERS)
       .updateOne(
         { chatId: userData.chatId },
         {
+          $set: updateData,
           $setOnInsert: {
-            ...userData,
-            timezone: null,
-            bedtime: null,
-            wakeupTime: null,
-            notifications: true,
-            sleepRecords: [],
+            username: userData.username,
             createdAt: new Date()
           }
         },
@@ -39,11 +45,11 @@ async function addUser(userData) {
 
     console.log(result.upsertedCount > 0
       ? `Добавлен пользователь: ${userData.username}:${userData.chatId}`
-      : `Пользователь ${userData.username}:${userData.chatId} уже существует`);
+      : `Обновлен пользователь: ${userData.username}:${userData.chatId}`);
 
     return result.upsertedCount > 0;
   } catch (error) {
-    console.error(`Ошибка добавления пользователя ${userData.username}:${userData.chatId}: `, error);
+    console.error(`Ошибка обновления пользователя ${userData.username}:${userData.chatId}:`, error);
     return false;
   }
 }
@@ -54,7 +60,7 @@ async function getUser(chatId) {
       .collection(collections.USERS)
       .findOne({ chatId });
   } catch (error) {
-    console.error(`Ошибка получения пользователя ${userData.username}:${userData.chatId}: `, error);
+    console.error(`Ошибка получения пользователя ${chatId}:`, error);
     return null;
   }
 }
@@ -67,8 +73,9 @@ async function getAllUsers() {
       .toArray();
     return records;
   } catch (error) {
-    console.error('Ошибка получения списка пользователей из MongoDB: ', error);
+    console.error('Ошибка получения списка пользователей из MongoDB:', error);
+    return [];
   }
 }
 
-module.exports = { connectDB, addUser, getUser, getAllUsers };
+module.exports = { connectDB, updateUser, getUser, getAllUsers };
