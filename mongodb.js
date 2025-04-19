@@ -27,19 +27,16 @@ async function updateUser(userData, isNew = false) {
       sleepRecords: []
     };
 
-    const updateData = isNew ? { ...defaultUser, ...userData } : userData;
+    // Если isNew: true, добавляем createdAt и мержим с дефолтными значениями
+    const updateData = isNew
+      ? { ...defaultUser, ...userData, createdAt: new Date() }
+      : userData;
 
     const result = await database
       .collection(collections.USERS)
       .updateOne(
         { chatId: userData.chatId },
-        {
-          $set: updateData,
-          $setOnInsert: {
-            username: userData.username,
-            createdAt: new Date()
-          }
-        },
+        { $set: updateData },
         { upsert: true }
       );
 
