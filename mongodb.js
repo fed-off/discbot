@@ -19,6 +19,12 @@ async function connectDB() {
 
 async function addUser(userData) {
   try {
+    const existingUser = await getUser(userData.chatId);
+    if (existingUser) {
+      console.log(`Пользователь уже существует: ${userData.username}:${userData.chatId}`);
+      return false;
+    }
+
     const defaultUser = {
       chatId: userData.chatId,
       username: userData.username,
@@ -31,7 +37,6 @@ async function addUser(userData) {
     };
 
     const result = await updateUser(defaultUser);
-    console.log(`Создан новый пользователь: ${userData.username}:${userData.chatId}`);
     return result;
   } catch (error) {
     console.error(`Ошибка добавления пользователя ${userData.username}:${userData.chatId}:`, error);
@@ -49,7 +54,10 @@ async function updateUser(userData) {
         { upsert: true }
       );
 
-    console.log(`Обновлен пользователь: ${userData.username}:${userData.chatId}`);
+    console.log(result.upsertedCount > 0
+      ? `Пользователь добавлен в базу: ${userData.username}:${userData.chatId}`
+      : `Пользователь обновлен в базе: ${userData.username}:${userData.chatId}`);
+
     return true;
   } catch (error) {
     console.error(`Ошибка обновления пользователя ${userData.username}:${userData.chatId}:`, error);
