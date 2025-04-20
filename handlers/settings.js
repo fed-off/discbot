@@ -1,4 +1,3 @@
-const { createConversation } = require('@grammyjs/conversations');
 const { InlineKeyboard } = require('grammy');
 const { updateUser, getUser } = require('../mongodb');
 
@@ -97,4 +96,4 @@ async function settingsConversation(conversation, ctx) {
   }
 }
 
-module.exports = { settingsConversation: createConversation(settingsConversation, 'settings') };
+module.exports = { settingsConversation };

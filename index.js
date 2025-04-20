@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Bot, Composer } = require('grammy');
+const { Bot } = require('grammy');
 const { conversations, createConversation } = require('@grammyjs/conversations');
 const { connectDB } = require('./mongodb');
 const { handleStart } = require('./handlers/start');
@@ -10,7 +10,7 @@ const bot = new Bot(process.env.BOT_API_KEY);
 
 // Устанавливаем conversations
 bot.use(conversations());
-bot.use(createConversation(settingsConversation));
+bot.use(createConversation(settingsConversation, 'settings'));
 
 // Команды
 bot.command('start', handleStart);
