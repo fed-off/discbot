@@ -17,34 +17,40 @@ async function connectDB() {
   }
 }
 
-async function updateUser(userData, isNew = false) {
+async function addUser(userData) {
   try {
     const defaultUser = {
+      chatId: userData.chatId,
+      username: userData.username,
       timezone: null,
       bedtime: null,
       wakeupTime: null,
       notifications: true,
-      sleepRecords: []
+      sleepRecords: [],
+      createdAt: new Date()
     };
 
-    // Если isNew: true, добавляем createdAt и мержим с дефолтными значениями
-    const updateData = isNew
-      ? { ...defaultUser, ...userData, createdAt: new Date() }
-      : userData;
+    const result = await updateUser(defaultUser);
+    console.log(`Создан новый пользователь: ${userData.username}:${userData.chatId}`);
+    return result;
+  } catch (error) {
+    console.error(`Ошибка добавления пользователя ${userData.username}:${userData.chatId}:`, error);
+    return false;
+  }
+}
 
+async function updateUser(userData) {
+  try {
     const result = await database
       .collection(collections.USERS)
       .updateOne(
         { chatId: userData.chatId },
-        { $set: updateData },
+        { $set: userData },
         { upsert: true }
       );
 
-    console.log(result.upsertedCount > 0
-      ? `Добавлен пользователь: ${userData.username}:${userData.chatId}`
-      : `Обновлен пользователь: ${userData.username}:${userData.chatId}`);
-
-    return result.upsertedCount > 0;
+    console.log(`Обновлен пользователь: ${userData.username}:${userData.chatId}`);
+    return true;
   } catch (error) {
     console.error(`Ошибка обновления пользователя ${userData.username}:${userData.chatId}:`, error);
     return false;
@@ -75,4 +81,4 @@ async function getAllUsers() {
   }
 }
 
-module.exports = { connectDB, updateUser, getUser, getAllUsers };
+module.exports = { connectDB, addUser, updateUser, getUser, getAllUsers };
